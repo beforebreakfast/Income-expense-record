@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Finance Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="header">
+    <h1 class="greeting">Good Morning, <span id="userName">Beforebreakfast</span>!</h1>
+
+    <div class="header-controls">
+  <button class="export-btn" id="exportBtn" type="button">
+    <i class="fas fa-download"></i>
+    Export
+  </button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="dashboard-grid">
+      <div class="main-content">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Monthly Income</h3>
+            <button class="card-menu" type="button"><i class="fas fa-ellipsis-h"></i></button>
+          </div>
+          <div class="amount income-amount">฿0.00</div>
+          <div class="trend positive">
+            <i class="fas fa-arrow-up"></i>
+            <span id="incomeTrend">0% vs Last month</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Monthly Expenses</h3>
+            <button class="card-menu" type="button"><i class="fas fa-ellipsis-h"></i></button>
+          </div>
+          <div class="amount expense-amount">฿0.00</div>
+          <div class="trend positive">
+            <i class="fas fa-arrow-up"></i>
+            <span id="expenseTrend">0% vs Last month</span>
+          </div>
+        </div>
+
+        <div class="card my-card">
+          <div class="card-header">
+            <h3 class="card-title">My Card</h3>
+            <button class="card-menu" id="editCardBtn" type="button" title="Edit My Card">
+              <i class="fas fa-pen"></i>
+            </button>
+          </div>
+
+          <div class="muted-white">Linked to your primary wallet</div>
+
+          <div class="card-chip"></div>
+
+          <div class="card-number" id="cardNumberDisplay">0000 0000 0000 0000</div>
+          <div class="card-holder" id="cardNameDisplay">-</div>
+
+          <div class="card-logo">
+            <div class="card-logo-circle logo-red"></div>
+            <div class="card-logo-circle logo-orange"></div>
+          </div>
+
+          <div class="spending-section">
+            <div class="muted-white" style="margin-bottom:.5rem;">Spending Limit</div>
+
+            <div class="spending-limit" id="spendingLimitDisplay">฿0.00</div>
+            <div class="spending-used" id="spendingUsedDisplay">used from ฿0.00</div>
+
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Overview</h3>
+            <div class="header-right">
+              <div class="dropdown-wrap">
+                <button class="dropdown" id="overviewPeriodBtn" type="button">
+                  <span id="overviewPeriodLabel">Yearly</span>
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-menu" id="overviewPeriodMenu">
+                  <button type="button" class="menu-item" data-overview="Monthly">Monthly</button>
+                  <button type="button" class="menu-item" data-overview="Yearly">Yearly</button>
+                </div>
+              </div>
+
+              <button class="filter-btn" id="overviewFilterBtn" type="button">
+                <i class="fas fa-filter"></i> Filter
+              </button>
+            </div>
+          </div>
+
+          <div class="chart">
+            <div class="chart-bars" id="chartBars"></div>
+            <div class="chart-months">
+              <span>Feb</span><span>Mar</span><span>Apr</span><span>Mei</span><span>Jun</span><span>Jul</span>
+              <span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Des</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">All Expenses</h3>
+            <button class="card-menu" type="button"><i class="fas fa-ellipsis-h"></i></button>
+          </div>
+
+          <div class="subtle">Spending breakdown by category</div>
+
+          <div class="expenses-breakdown">
+            <div class="total-expenses" id="allExpensesTotal">฿0.00</div>
+
+            <div class="period-tabs" id="expenseTabs">
+              <button type="button" class="period-tab" data-tab="Daily">Daily</button>
+              <button type="button" class="period-tab" data-tab="Weekly">Weekly</button>
+              <button type="button" class="period-tab active" data-tab="Monthly">Monthly</button>
+            </div>
+
+            <div class="period-amounts">
+              <span>Daily</span><span>Weekly</span><span>Monthly</span>
+            </div>
+            <div class="period-values" id="periodValues">
+              <span>฿0</span><span>฿0</span><span>฿0</span>
+            </div>
+
+            <div class="color-bar"></div>
+
+            <ul class="expense-categories" id="categoryList">
+              <li class="expense-category">
+                <div class="category-info"><div class="category-dot dot-food"></div><span>Food & Health</span></div>
+                <span data-cat="Food & health">0</span>
+              </li>
+              <li class="expense-category">
+                <div class="category-info"><div class="category-dot dot-entertainment"></div><span>Entertainments</span></div>
+                <span data-cat="Entertainments">0</span>
+              </li>
+              <li class="expense-category">
+                <div class="category-info"><div class="category-dot dot-shopping"></div><span>Shopping</span></div>
+                <span data-cat="Shopping">0</span>
+              </li>
+              <li class="expense-category">
+                <div class="category-info"><div class="category-dot dot-investment"></div><span>Investment</span></div>
+                <span data-cat="Investment">0</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Recent Transactions</h3>
+            <div class="header-right">
+              <button class="sort-btn" id="sortBtn" type="button">
+                <i class="fas fa-sort"></i> <span id="sortLabel">Sort</span>
+              </button>
+              <button class="filter-btn" id="tableFilterBtn" type="button">
+                <i class="fas fa-filter"></i> Filter
+              </button>
+            </div>
+          </div>
+
+          <table class="transactions-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="txBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <button class="fab fab-income" id="addIncomeFab" type="button" title="Add Income">
+      <i class="fas fa-plus"></i>
+    </button>
+    <button class="fab fab-expense" id="addExpenseFab" type="button" title="Add Expense">
+      <i class="fas fa-minus"></i>
+    </button>
+  </div>
+
+  <div id="incomeModal" class="modal">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Income</h2>
+        <button class="close-btn" type="button" data-close="incomeModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="incomeForm">
+          <div class="form-group">
+            <label>Amount*</label>
+            <input type="number" id="incomeAmount" placeholder="Enter amount" required />
+          </div>
+          <div class="form-group">
+            <label>Category*</label>
+            <select id="incomeCategory" required>
+              <option value="">Select category</option>
+              <option value="Salary">Salary</option>
+              <option value="Freelance">Freelance</option>
+              <option value="Investment">Investment</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" id="incomeDescription" placeholder="Optional description" />
+          </div>
+          <div class="form-group">
+            <label>Date*</label>
+            <input type="date" id="incomeDate" required />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-close="incomeModal">Cancel</button>
+        <button class="btn btn-primary" id="saveIncomeBtn" type="button">Add Income</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="expenseModal" class="modal">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Expense</h2>
+        <button class="close-btn" type="button" data-close="expenseModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="expenseForm">
+          <div class="form-group">
+            <label>Amount*</label>
+            <input type="number" id="expenseAmount" placeholder="Enter amount" required />
+          </div>
+          <div class="form-group">
+            <label>Category*</label>
+            <select id="expenseCategory" required>
+              <option value="">Select category</option>
+              <option value="Food & health">Food & Health</option>
+              <option value="Entertainments">Entertainments</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Investment">Investment</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" id="expenseDescription" placeholder="Optional description" />
+          </div>
+          <div class="form-group">
+            <label>Date*</label>
+            <input type="date" id="expenseDate" required />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-close="expenseModal">Cancel</button>
+        <button class="btn btn-primary" id="saveExpenseBtn" type="button">Add Expense</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cardModal" class="modal">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit My Card</h2>
+        <button class="close-btn" type="button" data-close="cardModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="cardForm">
+          <div class="form-group">
+            <label>Account Name*</label>
+            <input type="text" id="cardNameInput" required />
+          </div>
+          <div class="form-group">
+            <label>Account Number*</label>
+            <input type="text" id="cardNumberInput" placeholder="0000 0000 0000 0000" required />
+          </div>
+          <div class="form-group">
+            <label>Spending Limit*</label>
+            <input type="number" id="cardLimitInput" min="0" step="1" required />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-close="cardModal">Cancel</button>
+        <button class="btn btn-primary" id="saveCardBtn" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-menu" id="actionMenu">
+    <button type="button" class="menu-item" id="deleteTxBtn">
+      <i class="fas fa-trash"></i> Delete
+    </button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
