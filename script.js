@@ -1,8 +1,8 @@
-// script.js (compact)
+// script.js (fixed + compact)
 const STORAGE_KEY = "finance_state_v2";
 const CURRENCY = "฿";
 
-let state = {
+const DEFAULT_STATE = {
   transactions: [],
   card: { name: "-", number: "0000 0000 0000 0000", limit: 0 },
   ui: {
@@ -14,20 +14,67 @@ let state = {
   },
 };
 
+let state = structuredClone(DEFAULT_STATE);
+
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
 const money = (n) => `${CURRENCY}${Number(n || 0).toLocaleString()}.00`;
 const moneyPlain = (n) => `${CURRENCY}${Number(n || 0).toLocaleString()}`;
 
 const saveState = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-const loadState = () => {
+
+function normalizeState(input) {
+  const s = structuredClone(DEFAULT_STATE);
+
+  if (input && typeof input === "object") {
+    if (Array.isArray(input.transactions)) s.transactions = input.transactions.filter(Boolean);
+    if (input.card && typeof input.card === "object") {
+      s.card.name = typeof input.card.name === "string" ? input.card.name : s.card.name;
+      s.card.number = typeof input.card.number === "string" ? input.card.number : s.card.number;
+      s.card.limit = Math.max(0, Number(input.card.limit || 0));
+    }
+    if (input.ui && typeof input.ui === "object") {
+      s.ui.period = typeof input.ui.period === "string" ? input.ui.period : s.ui.period;
+      s.ui.overview = typeof input.ui.overview === "string" ? input.ui.overview : s.ui.overview;
+      s.ui.date = typeof input.ui.date === "string" ? input.ui.date : s.ui.date;
+      s.ui.expenseTab = typeof input.ui.expenseTab === "string" ? input.ui.expenseTab : s.ui.expenseTab;
+
+      if (input.ui.sort && typeof input.ui.sort === "object") {
+        const key = input.ui.sort.key;
+        const dir = input.ui.sort.dir;
+        s.ui.sort.key = ["date", "amount", "category"].includes(key) ? key : s.ui.sort.key;
+        s.ui.sort.dir = dir === "asc" || dir === "desc" ? dir : s.ui.sort.dir;
+      }
+    }
+  }
+
+  // sanitize transactions
+  s.transactions = s.transactions
+    .map((t) => {
+      if (!t || typeof t !== "object") return null;
+      const id = Number(t.id || Date.now());
+      const date = typeof t.date === "string" ? t.date : new Date().toISOString().split("T")[0];
+      const category = typeof t.category === "string" ? t.category : "Other";
+      const amount = Number(t.amount || 0);
+      const status = typeof t.status === "string" ? t.status : "Success";
+      const type = typeof t.type === "string" ? t.type : amount >= 0 ? "income" : "expense";
+      const description = typeof t.description === "string" ? t.description : "";
+      return { id, date, category, amount, status, type, description };
+    })
+    .filter(Boolean);
+
+  return s;
+}
+
+function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
-    const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === "object") state = parsed;
-  } catch {}
-};
+    state = normalizeState(JSON.parse(raw));
+  } catch {
+    state = structuredClone(DEFAULT_STATE);
+  }
+}
 
 const openModal = (id) => {
   const el = document.getElementById(id);
@@ -43,7 +90,7 @@ const closeModal = (id) => {
 };
 
 const getActiveDate = () => {
-  const d = state.ui.date ? new Date(state.ui.date) : new Date();
+  const d = state.ui?.date ? new Date(state.ui.date) : new Date();
   return isNaN(d.getTime()) ? new Date() : d;
 };
 const getActiveYM = () => {
@@ -62,8 +109,8 @@ const sumMonthExpense = (y, m) =>
   state.transactions.reduce((a, t) => (t.amount < 0 && inSameMonth(t.date, y, m) ? a + Math.abs(+t.amount || 0) : a), 0);
 
 const sumRangeExpense = (fromDate, toDate) => {
-  const from = fromDate.getTime(),
-    to = toDate.getTime();
+  const from = fromDate.getTime();
+  const to = toDate.getTime();
   return state.transactions.reduce((a, t) => {
     const d = new Date(t.date).getTime();
     if (isNaN(d) || d < from || d > to || t.amount >= 0) return a;
@@ -88,8 +135,7 @@ function updateAllExpenses() {
   const dailyExpense = sumRangeExpense(startDaily, end);
   const weeklyExpense = sumRangeExpense(startWeekly, end);
 
-  const totalEl = $("#allExpensesTotal");
-  if (totalEl) totalEl.textContent = money(monthlyExpense);
+  $("#allExpensesTotal") && ($("#allExpensesTotal").textContent = money(monthlyExpense));
 
   const pv = $$("#periodValues span");
   if (pv.length >= 3) {
@@ -133,8 +179,8 @@ function renderOverview() {
   });
 
   const maxTotal = Math.max(1, ...data.map((d) => d.total));
-  const MAX_H = 180,
-    MIN_H = 18;
+  const MAX_H = 180;
+  const MIN_H = 18;
 
   wrap.innerHTML = "";
   data.forEach((d) => {
@@ -152,12 +198,8 @@ function renderOverview() {
     bar.innerHTML = `
       <div class="tooltip">
         <div class="tooltip-month">${monthLabel}</div>
-        <div class="tooltip-row income"><span>Income:</span><span class="tooltip-amount">${moneyPlain(
-          Math.round(d.income)
-        )}</span></div>
-        <div class="tooltip-row expense"><span>Expenses:</span><span class="tooltip-amount">${moneyPlain(
-          Math.round(d.expense)
-        )}</span></div>
+        <div class="tooltip-row income"><span>Income:</span><span class="tooltip-amount">${moneyPlain(Math.round(d.income))}</span></div>
+        <div class="tooltip-row expense"><span>Expenses:</span><span class="tooltip-amount">${moneyPlain(Math.round(d.expense))}</span></div>
       </div>
       <div class="chart-bar-income" style="height:${incomeH}px;"></div>
       <div class="chart-bar-expense" style="height:${expenseH}px;"></div>
@@ -177,25 +219,17 @@ function updateDashboard() {
   const income = sumMonthIncome(y, m);
   const expense = sumMonthExpense(y, m);
 
-  const incomeEl = $(".income-amount");
-  const expenseEl = $(".expense-amount");
-  if (incomeEl) incomeEl.textContent = money(income);
-  if (expenseEl) expenseEl.textContent = money(expense);
+  $(".income-amount") && ($(".income-amount").textContent = money(income));
+  $(".expense-amount") && ($(".expense-amount").textContent = money(expense));
 
-  const limitEl = $("#spendingLimitDisplay");
-  const usedEl = $("#spendingUsedDisplay");
-  const fillEl = $("#progressFill");
-
-  if (limitEl) limitEl.textContent = money(state.card.limit);
-  if (usedEl) usedEl.textContent = `used from ${money(expense)}`;
+  $("#spendingLimitDisplay") && ($("#spendingLimitDisplay").textContent = money(state.card.limit));
+  $("#spendingUsedDisplay") && ($("#spendingUsedDisplay").textContent = `used from ${money(expense)}`);
 
   const pct = state.card.limit > 0 ? (expense / state.card.limit) * 100 : 0;
-  if (fillEl) fillEl.style.width = `${Math.min(Math.max(pct, 0), 100)}%`;
+  $("#progressFill") && ($("#progressFill").style.width = `${Math.min(Math.max(pct, 0), 100)}%`);
 
-  const nameEl = $("#cardNameDisplay");
-  const numEl = $("#cardNumberDisplay");
-  if (nameEl) nameEl.textContent = state.card.name || "-";
-  if (numEl) numEl.textContent = state.card.number || "0000 0000 0000 0000";
+  $("#cardNameDisplay") && ($("#cardNameDisplay").textContent = state.card.name || "-");
+  $("#cardNumberDisplay") && ($("#cardNumberDisplay").textContent = state.card.number || "0000 0000 0000 0000");
 
   updateAllExpenses();
   renderOverview();
@@ -243,30 +277,29 @@ function updateTransactionsTable() {
     return;
   }
 
-  tbody.innerHTML = rows
-    .map((t) => {
-      const formattedDate = new Date(t.date).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-      const amtAbs = money(Math.abs(+t.amount || 0));
-      const amt = t.amount > 0 ? `+${amtAbs}` : `-${amtAbs}`;
-      const color = t.amount > 0 ? "#10b981" : "#ef4444";
-      return `
-        <tr>
-          <td>${formattedDate}</td>
-          <td>${t.category}</td>
-          <td style="color:${color}">${amt}</td>
-          <td><span class="status-success">${t.status}</span></td>
-          <td>
-            <button class="action-btn" type="button" data-action-id="${t.id}">
-              <i class="fas fa-ellipsis-h"></i>
-            </button>
-          </td>
-        </tr>`;
-    })
-    .join("");
+  for (const t of rows) {
+    const tr = document.createElement("tr");
+    const formattedDate = new Date(t.date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
+    const amt = t.amount > 0 ? `+${money(Math.abs(+t.amount))}` : `-${money(Math.abs(+t.amount))}`;
+
+    tr.innerHTML = `
+      <td>${formattedDate}</td>
+      <td>${t.category}</td>
+      <td style="color:${t.amount > 0 ? "#10b981" : "#ef4444"}">${amt}</td>
+      <td><span class="status-success">${t.status}</span></td>
+      <td>
+        <button class="action-btn" type="button" data-action-id="${t.id}">
+          <i class="fas fa-ellipsis-h"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  }
 
   $$(".action-btn", tbody).forEach((btn) => {
     btn.addEventListener("click", (e) => {
@@ -285,8 +318,9 @@ function addIncome() {
 
   const amount = parseFloat(amountEl.value);
   const category = categoryEl.value;
-  const date = dateEl.value;
   const description = $("#incomeDescription")?.value || "";
+  const date = dateEl.value;
+
   if (!amount || !category || !date) return;
 
   state.transactions.unshift({
@@ -314,8 +348,9 @@ function addExpense() {
 
   const amount = parseFloat(amountEl.value);
   const category = categoryEl.value;
-  const date = dateEl.value;
   const description = $("#expenseDescription")?.value || "";
+  const date = dateEl.value;
+
   if (!amount || !category || !date) return;
 
   state.transactions.unshift({
@@ -335,21 +370,7 @@ function addExpense() {
   $("#expenseForm")?.reset();
 }
 
-function initDates() {
-  const today = new Date().toISOString().split("T")[0];
-  if (!state.ui.date) state.ui.date = today;
-
-  $("#incomeDate") && ($("#incomeDate").value = today);
-  $("#expenseDate") && ($("#expenseDate").value = today);
-
-  const dateInput = $("#dateInput");
-  if (dateInput) {
-    dateInput.value = state.ui.date;
-    dateInput.dispatchEvent(new Event("change"));
-  }
-}
-
-function wireUI() {
+function wireButtons() {
   $("#addIncomeFab")?.addEventListener("click", () => openModal("incomeModal"));
   $("#addExpenseFab")?.addEventListener("click", () => openModal("expenseModal"));
 
@@ -368,12 +389,12 @@ function wireUI() {
   });
 
   $("#saveCardBtn")?.addEventListener("click", () => {
-    const name = (String($("#cardNameInput")?.value || "-")).trim();
-    const number = (String($("#cardNumberInput")?.value || "0000 0000 0000 0000")).trim();
+    const name = (($("#cardNameInput")?.value || "-") + "").trim();
+    const number = (($("#cardNumberInput")?.value || "0000 0000 0000 0000") + "").trim();
     const limit = Math.max(0, Number($("#cardLimitInput")?.value || 0));
 
-    state.card.name = name || "-";
-    state.card.number = number || "0000 0000 0000 0000";
+    state.card.name = name.length ? name : "-";
+    state.card.number = number.length ? number : "0000 0000 0000 0000";
     state.card.limit = limit;
 
     saveState();
@@ -394,57 +415,23 @@ function wireUI() {
   $("#tableFilterBtn")?.addEventListener("click", () => alert("Filter clicked"));
   $("#overviewFilterBtn")?.addEventListener("click", () => alert("Filter clicked"));
 
-  const periodBtn = $("#periodBtn");
   const overviewPeriodBtn = $("#overviewPeriodBtn");
-
-  periodBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    periodBtn.parentElement?.classList.toggle("open");
-    overviewPeriodBtn?.parentElement?.classList.remove("open");
-  });
-  overviewPeriodBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    overviewPeriodBtn.parentElement?.classList.toggle("open");
-    periodBtn?.parentElement?.classList.remove("open");
-  });
-
-  $("#periodMenu") &&
-    $$("#periodMenu .menu-item").forEach((btn) =>
+  if (overviewPeriodBtn) {
+    overviewPeriodBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      overviewPeriodBtn.parentElement?.classList.toggle("open");
+    });
+  }
+  if ($("#overviewPeriodMenu")) {
+    $$("#overviewPeriodMenu .menu-item").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const p = btn.getAttribute("data-period") || "Daily";
-        state.ui.period = p;
-        $("#periodLabel") && ($("#periodLabel").textContent = p);
-        periodBtn?.parentElement?.classList.remove("open");
-        saveState();
-      })
-    );
-
-  $("#overviewPeriodMenu") &&
-    $$("#overviewPeriodMenu .menu-item").forEach((btn) =>
-      btn.addEventListener("click", () => {
-        const p = btn.getAttribute("data-overview") || "Yearly";
+        const p = btn.getAttribute("data-overview");
         state.ui.overview = p;
         $("#overviewPeriodLabel") && ($("#overviewPeriodLabel").textContent = p);
         overviewPeriodBtn?.parentElement?.classList.remove("open");
         saveState();
         renderOverview();
-      })
-    );
-
-  const dateBtn = $("#dateBtn");
-  const dateInput = $("#dateInput");
-  if (dateBtn && dateInput) {
-    dateBtn.addEventListener("click", () => (dateInput.showPicker ? dateInput.showPicker() : dateInput.click()));
-    dateInput.addEventListener("change", () => {
-      state.ui.date = dateInput.value;
-      const d = new Date(state.ui.date);
-      const label = isNaN(d.getTime())
-        ? "-"
-        : d.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
-      $("#dateLabel") && ($("#dateLabel").textContent = label);
-      saveState();
-      updateDashboard();
-      updateTransactionsTable();
+      });
     });
   }
 
@@ -460,16 +447,15 @@ function wireUI() {
     URL.revokeObjectURL(url);
   });
 
-  $("#expenseTabs") &&
-    $$("#expenseTabs .period-tab").forEach((btn) =>
-      btn.addEventListener("click", () => {
-        $$("#expenseTabs .period-tab").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        state.ui.expenseTab = btn.getAttribute("data-tab") || "Monthly";
-        saveState();
-        updateAllExpenses();
-      })
-    );
+  $$("#expenseTabs .period-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      $$("#expenseTabs .period-tab").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.ui.expenseTab = btn.getAttribute("data-tab");
+      saveState();
+      updateAllExpenses();
+    });
+  });
 
   $("#deleteTxBtn")?.addEventListener("click", () => {
     if (!actionTxId) return;
@@ -484,29 +470,37 @@ function wireUI() {
 function wireGlobalClose() {
   document.addEventListener("click", () => {
     closeActionMenu();
-    $("#periodBtn")?.parentElement?.classList.remove("open");
     $("#overviewPeriodBtn")?.parentElement?.classList.remove("open");
   });
 
-  $$(".modal").forEach((m) =>
+  $$(".modal").forEach((m) => {
     m.addEventListener("click", (e) => {
       if (e.target === m) {
         m.classList.remove("open");
         document.body.style.overflow = "auto";
       }
-    })
-  );
+    });
+  });
+}
+
+function initDates() {
+  const today = new Date().toISOString().split("T")[0];
+  if (!state.ui.date) state.ui.date = today;
+
+  $("#incomeDate") && ($("#incomeDate").value = today);
+  $("#expenseDate") && ($("#expenseDate").value = today);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   loadState();
+  state = normalizeState(state); // กัน state เก่าพัง
+  saveState(); // อัปเดตให้เป็นรูปแบบใหม่ทันที
 
-  $("#periodLabel") && ($("#periodLabel").textContent = state.ui.period || "Daily");
   $("#overviewPeriodLabel") && ($("#overviewPeriodLabel").textContent = state.ui.overview || "Yearly");
   $("#sortLabel") && ($("#sortLabel").textContent = "Sort");
 
   initDates();
-  wireUI();
+  wireButtons();
   wireGlobalClose();
 
   updateDashboard();
