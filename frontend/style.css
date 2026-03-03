@@ -1,0 +1,116 @@
+/* style.css */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f8fafc;color:#1e293b;line-height:1.5;padding:1rem}
+.container{max-width:1400px;margin:0 auto}
+.header{max-width:1400px;margin:0 auto 2rem;display:flex;justify-content:space-between;align-items:center;padding:1rem 0}
+.greeting{font-size:2rem;font-weight:700;color:#0f172a}
+.header-controls{display:flex;align-items:center;gap:1rem}
+
+.dropdown,.date-selector{padding:.75rem 1rem;border:1px solid #e2e8f0;border-radius:8px;background:#fff;display:flex;align-items:center;gap:.5rem;font-size:.875rem;font-weight:500;cursor:pointer}
+.export-btn{padding:.75rem 1.5rem;background:#ea580c;color:#fff;border:none;border-radius:8px;font-size:.875rem;font-weight:500;display:flex;align-items:center;gap:.5rem;cursor:pointer}
+.export-btn:active,.dropdown:active,.date-selector:active{transform:translateY(1px)}
+
+.dashboard-grid{display:grid;grid-template-columns:1fr 2fr;gap:2rem}
+.main-content,.chart-section{display:flex;flex-direction:column;gap:1.5rem}
+
+.card{background:#fff;border-radius:16px;padding:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #f1f5f9}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem}
+.card-title{font-size:1.125rem;font-weight:600;color:#0f172a}
+.card-menu{background:none;border:none;color:#94a3b8;font-size:1rem;padding:.25rem;cursor:pointer}
+.amount{font-size:2.5rem;font-weight:700;color:#0f172a;margin-bottom:.75rem}
+.trend{display:flex;align-items:center;gap:.5rem;font-size:.875rem;font-weight:500}
+.trend.positive{color:#10b981}
+.subtle{font-size:.75rem;color:#6b7280;margin-bottom:1rem}
+
+.my-card{background:linear-gradient(135deg,#059669,#10b981);color:#fff;position:relative;overflow:hidden}
+.my-card .card-title{color:#fff}
+.muted-white{font-size:.75rem;opacity:.85;margin-bottom:1rem}
+.card-chip{width:40px;height:30px;background:#fbbf24;border-radius:6px;margin:1rem 0;position:relative}
+.card-chip::before{content:"";position:absolute;inset:4px;background:#92400e;border-radius:4px}
+.card-number{font-size:1.25rem;font-weight:600;letter-spacing:.1em;margin-bottom:1rem}
+.card-holder{font-size:.875rem;opacity:.9;margin-bottom:2rem}
+.card-logo{position:absolute;bottom:1.5rem;right:1.5rem;display:flex}
+.card-logo-circle{width:32px;height:32px;border-radius:50%}
+.logo-red{background:#ef4444;margin-right:-12px}
+.logo-orange{background:#f59e0b}
+
+.spending-section{margin-top:1rem}
+.spending-limit{font-size:1.5rem;font-weight:700;margin-bottom:.25rem}
+.spending-used{font-size:.875rem;opacity:.85;margin-bottom:.75rem}
+.progress-bar{height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:#ea580c;border-radius:3px;width:0%}
+
+.header-right{display:flex;gap:1rem;align-items:center}
+.filter-btn,.sort-btn{padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:8px;background:#fff;font-size:.875rem;font-weight:500;display:flex;align-items:center;gap:.5rem;color:#0f172a;cursor:pointer}
+.filter-btn:active,.sort-btn:active{transform:translateY(1px)}
+
+.chart{margin-top:1.5rem}
+.chart-bars{display:flex;align-items:flex-end;justify-content:space-between;height:220px;padding:1rem 0;position:relative}
+.chart-bar{width:40px;background:#e5e7eb;border-radius:8px;position:relative;transition:all .2s ease}
+.chart-bar.active{background:#f1f5f9;position:relative;display:flex;flex-direction:column;justify-content:flex-end}
+.chart-bar-income{width:100%;background:#10b981;border-radius:8px 8px 0 0;height:0px}
+.chart-bar-expense{width:100%;background:#ea580c;border-radius:0 0 8px 8px;height:0px}
+.tooltip{position:absolute;top:-80px;left:50%;transform:translateX(-50%);background:#fff;padding:.75rem;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.15);font-size:.75rem;min-width:120px;z-index:10;display:none}
+.chart-bar.active .tooltip{display:block}
+.tooltip-month{font-weight:600;margin-bottom:.5rem;color:#0f172a}
+.tooltip-row{display:flex;justify-content:space-between;margin-bottom:.25rem}
+.tooltip-row.income{color:#10b981}
+.tooltip-row.expense{color:#ea580c}
+.chart-months{display:flex;justify-content:space-between;font-size:.75rem;color:#6b7280;margin-top:.5rem}
+
+.expenses-breakdown{margin-top:1rem}
+.total-expenses{font-size:2.5rem;font-weight:700;color:#0f172a;margin-bottom:1rem}
+.period-tabs{display:flex;gap:1rem;margin-bottom:1rem}
+.period-tab{border:none;background:none;font-size:.875rem;font-weight:500;color:#6b7280;padding-bottom:.5rem;border-bottom:2px solid transparent;cursor:pointer}
+.period-tab.active{color:#0f172a;border-bottom-color:#0f172a}
+.period-amounts,.period-values{display:flex;justify-content:space-between;margin-bottom:.75rem;font-size:.875rem}
+.period-amounts{color:#6b7280}
+.period-values{font-weight:600;color:#0f172a}
+.color-bar{height:6px;border-radius:3px;background:linear-gradient(90deg,#ea580c,#f59e0b,#10b981);margin:1rem 0}
+.expense-categories{list-style:none;margin-top:1rem}
+.expense-category{display:flex;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid #f1f5f9;align-items:center}
+.category-info{display:flex;align-items:center;gap:.75rem}
+.category-dot{width:8px;height:8px;border-radius:50%}
+.dot-food{background:#ea580c}
+.dot-entertainment{background:#f59e0b}
+.dot-shopping{background:#eab308}
+.dot-investment{background:#10b981}
+
+.transactions-table{width:100%;border-collapse:collapse;margin-top:1rem}
+.transactions-table th{text-align:left;padding:.75rem 0;font-size:.75rem;color:#6b7280;font-weight:500;border-bottom:1px solid #e5e7eb}
+.transactions-table td{padding:1rem 0;border-bottom:1px solid #f1f5f9;font-size:.875rem}
+.status-success{padding:.25rem .75rem;background:#dcfce7;color:#16a34a;border-radius:999px;font-size:.75rem;font-weight:500}
+.action-btn{background:none;border:none;color:#94a3b8;padding:.25rem;cursor:pointer}
+
+.fab{position:fixed;right:2rem;width:56px;height:56px;border-radius:50%;border:none;box-shadow:0 8px 20px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:#fff;z-index:999;cursor:pointer}
+.fab-income{bottom:6rem;background:#10b981}
+.fab-expense{bottom:2rem;background:#ef4444}
+.fab:active{transform:translateY(1px)}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000}
+.modal.open{display:block}
+.modal-content{background:#fff;width:90%;max-width:500px;margin:5% auto;border-radius:16px;overflow:hidden}
+.modal-header{padding:1.5rem;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:1.25rem;font-weight:600;color:#0f172a}
+.close-btn{background:none;border:none;font-size:1.5rem;color:#94a3b8;line-height:1;cursor:pointer}
+.modal-body{padding:1.5rem}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:.875rem;font-weight:500;color:#374151;margin-bottom:.5rem}
+.form-group input,.form-group select{width:100%;padding:.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem}
+.modal-footer{padding:1.5rem;border-top:1px solid #e5e7eb;display:flex;justify-content:flex-end;gap:1rem}
+.btn{padding:.75rem 1.5rem;border-radius:8px;font-size:.875rem;font-weight:500;border:none;cursor:pointer}
+.btn-primary{background:#ea580c;color:#fff}
+.btn-secondary{background:#f1f5f9;color:#0f172a}
+
+.dropdown-wrap{position:relative}
+.dropdown-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.12);min-width:160px;padding:.5rem;display:none;z-index:1200}
+.dropdown-wrap.open .dropdown-menu{display:block}
+.menu-item{width:100%;text-align:left;border:none;background:none;padding:.6rem .75rem;border-radius:10px;cursor:pointer;font-size:.875rem;color:#0f172a;display:flex;align-items:center;gap:.6rem}
+.menu-item:hover{background:#f1f5f9}
+
+.hidden-date-input{position:fixed;left:-9999px;top:-9999px}
+
+.action-menu{position:fixed;display:none;z-index:1500;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.12);padding:.5rem;min-width:160px}
+.action-menu.open{display:block}
+
+@media (max-width:1024px){.dashboard-grid{grid-template-columns:1fr}}
