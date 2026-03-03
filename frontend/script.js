@@ -69,13 +69,20 @@ function normalizeState(input) {
 
 async function loadState() {
   try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      state = normalizeState(JSON.parse(saved));
+    }
+
     const res = await fetch(API_URL);
     const data = await res.json();
 
     state.transactions = Array.isArray(data) ? data : [];
+
+    saveState();
+
   } catch (err) {
-    console.error("โหลดข้อมูลจาก backend ไม่ได้:", err);
-    state.transactions = [];
+    console.error("โหลดข้อมูลไม่สำเร็จ:", err);
   }
 }
 
