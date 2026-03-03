@@ -1,28 +1,53 @@
-# Income-expense-record
+# 💰 Income & Expense Record
 
-A simple personal finance dashboard for tracking income and expenses.  
-All data is stored locally in your browser using **LocalStorage** (no database required).
+A full-stack personal finance dashboard for tracking income and expenses.
 
-## Features
+This project allows users to manage transactions, monitor spending, and visualize financial data through an interactive dashboard.
+
+---
+
+## 🌐 Live Demo
+
+Frontend:
+https://income-expense-record-1.onrender.com
+
+Backend API:
+https://income-expense-record.onrender.com/api/transactions
+
+---
+
+## 🚀 Features
+
 - Add income and expense transactions
-- Automatically updates **Monthly Income** and **Monthly Expenses**
-- Overview chart for yearly/monthly spending & income
-- Edit “My Card” info (account name, number, spending limit)
+- Real-time dashboard updates
+- Monthly & yearly overview chart
+- Edit "My Card" information
 - Sort and delete transactions
-- Export data as JSON
+- Data stored in MongoDB (Cloud database)
+- Fully deployed on Render
 
-## Tech Stack
+---
+
+## 🏗 Tech Stack
+
+### Frontend
 - HTML
 - CSS
 - JavaScript (Vanilla)
 
-## How to Run
-1. Download/clone this project
-2. Open `index.html` in your browser  
-   *(Recommended: use VS Code Live Server)*
+### Backend
+- Node.js
+- Express.js
+- REST API
 
-## Data Storage
-This project saves your data in:
-- `localStorage` key: `finance_state_v2`
+### Database
+- MongoDB Atlas (Cloud Database)
 
-To reset everything, clear your browser LocalStorage for this site.
+### Deployment
+- Render (Frontend & Backend)
+
+---
+
+## 📡 API Endpoints
+
+GET all transactions:
