@@ -47,7 +47,3 @@ https://income-expense-record.onrender.com/api/transactions
 - Render (Frontend & Backend)
 
 ---
-
-## 📡 API Endpoints
-
-GET all transactions:
