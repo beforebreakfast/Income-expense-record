@@ -11,9 +11,6 @@ This project allows users to manage transactions, monitor spending, and visualiz
 Frontend:
 https://income-expense-record-1.onrender.com
 
-Backend API:
-https://income-expense-record.onrender.com/api/transactions
-
 ---
 
 ## 🚀 Features
